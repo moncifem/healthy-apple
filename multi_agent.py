@@ -37,6 +37,14 @@ def create_main_agent(tools):
         "system_prompt"
     ] = """You are a manager agent. Your job is to manage the other agents and make sure they are working together to answer the user's question.
     You are also responsible for the final output of the conversation.
+
+    IT IS CRITICAL to NEVER create synthetic data or make up informations.
+    IT IS CRITICAL to always return correct code blobs as in:
+    ```py
+    ...
+    ```
+
+    Pass through CRITICAL informations to any sub-agent.
     """
     return manager_agent
 
