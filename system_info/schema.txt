@@ -1,0 +1,185 @@
+[
+  {
+    "sql || ';'": "CREATE TABLE activitysummary (\n\tid INTEGER NOT NULL, \n\tdate_components VARCHAR NOT NULL, \n\tactive_energy_burned FLOAT, \n\tactive_energy_burned_goal FLOAT, \n\tactive_energy_burned_unit VARCHAR, \n\tapple_move_time FLOAT, \n\tapple_move_time_goal FLOAT, \n\tapple_exercise_time FLOAT, \n\tapple_exercise_time_goal FLOAT, \n\tapple_stand_hours INTEGER, \n\tapple_stand_hours_goal INTEGER, \n\thealth_data_id INTEGER, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(health_data_id) REFERENCES healthdata (id)\n);"
+  },
+  {
+    "sql || ';'": "CREATE TABLE audiogram (\n\tstart_date DATETIME NOT NULL, \n\tend_date DATETIME NOT NULL, \n\tcreation_date DATETIME, \n\tsource_name VARCHAR NOT NULL, \n\tsource_version VARCHAR, \n\tdevice VARCHAR, \n\tid INTEGER NOT NULL, \n\ttype VARCHAR NOT NULL, \n\thealth_data_id INTEGER, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(health_data_id) REFERENCES healthdata (id)\n);"
+  },
+  {
+    "sql || ';'": "CREATE TABLE clinicalrecord (\n\tid INTEGER NOT NULL, \n\ttype VARCHAR NOT NULL, \n\tidentifier VARCHAR NOT NULL, \n\tsource_name VARCHAR NOT NULL, \n\tsource_url VARCHAR NOT NULL, \n\tfhir_version VARCHAR NOT NULL, \n\treceived_date DATETIME NOT NULL, \n\tresource_file_path VARCHAR NOT NULL, \n\thealth_data_id INTEGER, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(health_data_id) REFERENCES healthdata (id)\n);"
+  },
+  {
+    "sql || ';'": "CREATE TABLE correlation (\n\tstart_date DATETIME NOT NULL, \n\tend_date DATETIME NOT NULL, \n\tcreation_date DATETIME, \n\tsource_name VARCHAR NOT NULL, \n\tsource_version VARCHAR, \n\tdevice VARCHAR, \n\tid INTEGER NOT NULL, \n\ttype VARCHAR NOT NULL, \n\thealth_data_id INTEGER, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(health_data_id) REFERENCES healthdata (id)\n);"
+  },
+  {
+    "sql || ';'": "CREATE TABLE correlationrecord (\n\tcorrelation_id INTEGER NOT NULL, \n\trecord_id INTEGER NOT NULL, \n\tPRIMARY KEY (correlation_id, record_id), \n\tFOREIGN KEY(correlation_id) REFERENCES correlation (id), \n\tFOREIGN KEY(record_id) REFERENCES record (id)\n);"
+  },
+  {
+    "sql || ';'": "CREATE TABLE eyeprescription (\n\tid INTEGER NOT NULL, \n\teye_side VARCHAR(5) NOT NULL, \n\tsphere FLOAT, \n\tsphere_unit VARCHAR, \n\tcylinder FLOAT, \n\tcylinder_unit VARCHAR, \n\taxis FLOAT, \n\taxis_unit VARCHAR, \n\t\"add\" FLOAT, \n\tadd_unit VARCHAR, \n\tvertex FLOAT, \n\tvertex_unit VARCHAR, \n\tprism_amount FLOAT, \n\tprism_amount_unit VARCHAR, \n\tprism_angle FLOAT, \n\tprism_angle_unit VARCHAR, \n\tfar_pd FLOAT, \n\tfar_pd_unit VARCHAR, \n\tnear_pd FLOAT, \n\tnear_pd_unit VARCHAR, \n\tbase_curve FLOAT, \n\tbase_curve_unit VARCHAR, \n\tdiameter FLOAT, \n\tdiameter_unit VARCHAR, \n\tvision_prescription_id INTEGER NOT NULL, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(vision_prescription_id) REFERENCES visionprescription (id)\n);"
+  },
+  {
+    "sql || ';'": "CREATE TABLE healthdata (\n\tid INTEGER NOT NULL, \n\tlocale VARCHAR NOT NULL, \n\texport_date DATETIME NOT NULL, \n\tdate_of_birth VARCHAR NOT NULL, \n\tbiological_sex VARCHAR NOT NULL, \n\tblood_type VARCHAR NOT NULL, \n\tfitzpatrick_skin_type VARCHAR NOT NULL, \n\tcardio_fitness_medications_use VARCHAR NOT NULL, \n\tPRIMARY KEY (id)\n);"
+  },
+  {
+    "sql || ';'": "CREATE TABLE heartratevariabilitymetadatalist (\n\tid INTEGER NOT NULL, \n\trecord_id INTEGER NOT NULL, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(record_id) REFERENCES record (id)\n);"
+  },
+  {
+    "sql || ';'": "CREATE TABLE instantaneousbeatsperminute (\n\tid INTEGER NOT NULL, \n\tbpm INTEGER NOT NULL, \n\ttime DATETIME NOT NULL, \n\thrv_list_id INTEGER NOT NULL, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(hrv_list_id) REFERENCES heartratevariabilitymetadatalist (id)\n);"
+  },
+  {
+    "sql || ';'": "CREATE TABLE metadataentry (\n\tid INTEGER NOT NULL, \n\t\"key\" VARCHAR NOT NULL, \n\tvalue VARCHAR NOT NULL, \n\tparent_type VARCHAR NOT NULL, \n\tparent_id INTEGER NOT NULL, \n\tPRIMARY KEY (id)\n);"
+  },
+  {
+    "sql || ';'": "CREATE TABLE record (\n\tstart_date DATETIME NOT NULL, \n\tend_date DATETIME NOT NULL, \n\tcreation_date DATETIME, \n\tsource_name VARCHAR NOT NULL, \n\tsource_version VARCHAR, \n\tdevice VARCHAR, \n\tid INTEGER NOT NULL, \n\ttype VARCHAR NOT NULL, \n\tunit VARCHAR, \n\tvalue VARCHAR, \n\thealth_data_id INTEGER, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(health_data_id) REFERENCES healthdata (id)\n);"
+  },
+  {
+    "sql || ';'": "CREATE TABLE sensitivitypoint (\n\tid INTEGER NOT NULL, \n\tfrequency_value FLOAT NOT NULL, \n\tfrequency_unit VARCHAR NOT NULL, \n\tleft_ear_value FLOAT, \n\tleft_ear_unit VARCHAR, \n\tleft_ear_masked BOOLEAN, \n\tleft_ear_clamping_range_lower_bound FLOAT, \n\tleft_ear_clamping_range_upper_bound FLOAT, \n\tright_ear_value FLOAT, \n\tright_ear_unit VARCHAR, \n\tright_ear_masked BOOLEAN, \n\tright_ear_clamping_range_lower_bound FLOAT, \n\tright_ear_clamping_range_upper_bound FLOAT, \n\taudiogram_id INTEGER NOT NULL, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(audiogram_id) REFERENCES audiogram (id)\n);"
+  },
+  {
+    "sql || ';'": "CREATE TABLE visionattachment (\n\tid INTEGER NOT NULL, \n\tidentifier VARCHAR, \n\tvision_prescription_id INTEGER NOT NULL, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(vision_prescription_id) REFERENCES visionprescription (id)\n);"
+  },
+  {
+    "sql || ';'": "CREATE TABLE visionprescription (\n\tid INTEGER NOT NULL, \n\ttype VARCHAR NOT NULL, \n\tdate_issued DATETIME NOT NULL, \n\texpiration_date DATETIME, \n\tbrand VARCHAR, \n\thealth_data_id INTEGER, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(health_data_id) REFERENCES healthdata (id)\n);"
+  },
+  {
+    "sql || ';'": "CREATE TABLE workout (\n\tstart_date DATETIME NOT NULL, \n\tend_date DATETIME NOT NULL, \n\tcreation_date DATETIME, \n\tsource_name VARCHAR NOT NULL, \n\tsource_version VARCHAR, \n\tdevice VARCHAR, \n\tid INTEGER NOT NULL, \n\tworkout_activity_type VARCHAR NOT NULL, \n\tduration FLOAT, \n\tduration_unit VARCHAR, \n\ttotal_distance FLOAT, \n\ttotal_distance_unit VARCHAR, \n\ttotal_energy_burned FLOAT, \n\ttotal_energy_burned_unit VARCHAR, \n\thealth_data_id INTEGER, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(health_data_id) REFERENCES healthdata (id)\n);"
+  },
+  {
+    "sql || ';'": "CREATE TABLE workoutevent (\n\tid INTEGER NOT NULL, \n\ttype VARCHAR NOT NULL, \n\tdate DATETIME NOT NULL, \n\tduration FLOAT, \n\tduration_unit VARCHAR, \n\tworkout_id INTEGER NOT NULL, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(workout_id) REFERENCES workout (id)\n);"
+  },
+  {
+    "sql || ';'": "CREATE TABLE workoutroute (\n\tstart_date DATETIME NOT NULL, \n\tend_date DATETIME NOT NULL, \n\tcreation_date DATETIME, \n\tsource_name VARCHAR NOT NULL, \n\tsource_version VARCHAR, \n\tdevice VARCHAR, \n\tid INTEGER NOT NULL, \n\tworkout_id INTEGER NOT NULL, \n\tfile_path VARCHAR, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(workout_id) REFERENCES workout (id)\n);"
+  },
+  {
+    "sql || ';'": "CREATE TABLE workoutstatistics (\n\tstart_date DATETIME NOT NULL, \n\tend_date DATETIME NOT NULL, \n\tcreation_date DATETIME, \n\tid INTEGER NOT NULL, \n\ttype VARCHAR NOT NULL, \n\taverage FLOAT, \n\tminimum FLOAT, \n\tmaximum FLOAT, \n\tsum FLOAT, \n\tunit VARCHAR, \n\tworkout_id INTEGER NOT NULL, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(workout_id) REFERENCES workout (id)\n);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX idx_activity_summary_duplicate ON activitysummary (date_components, health_data_id);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX idx_audiogram_duplicate ON audiogram (type, start_date, end_date, health_data_id);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX idx_clinical_record_duplicate ON clinicalrecord (identifier, health_data_id);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX idx_correlation_duplicate ON correlation (type, start_date, end_date, health_data_id);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX idx_correlation_record_duplicate ON correlationrecord (correlation_id, record_id);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX idx_record_duplicate ON record (type, start_date, end_date, health_data_id, value);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX idx_vision_prescription_duplicate ON visionprescription (type, date_issued, health_data_id);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX idx_workout_duplicate ON workout (workout_activity_type, start_date, end_date, health_data_id);"
+  },
+  {
+    "sql || ';'": "CREATE UNIQUE INDEX ix_activitysummary_date_components ON activitysummary (date_components);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_activitysummary_health_data_id ON activitysummary (health_data_id);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_audiogram_end_date ON audiogram (end_date);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_audiogram_health_data_id ON audiogram (health_data_id);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_audiogram_start_date ON audiogram (start_date);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_correlation_end_date ON correlation (end_date);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_correlation_health_data_id ON correlation (health_data_id);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_correlation_start_date ON correlation (start_date);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_correlation_type ON correlation (type);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_eyeprescription_vision_prescription_id ON eyeprescription (vision_prescription_id);"
+  },
+  {
+    "sql || ';'": "CREATE UNIQUE INDEX ix_heartratevariabilitymetadatalist_record_id ON heartratevariabilitymetadatalist (record_id);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_instantaneousbeatsperminute_hrv_list_id ON instantaneousbeatsperminute (hrv_list_id);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_metadataentry_key ON metadataentry (\"key\");"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_metadataentry_parent_id ON metadataentry (parent_id);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_metadataentry_parent_type ON metadataentry (parent_type);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_record_end_date ON record (end_date);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_record_health_data_id ON record (health_data_id);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_record_start_date ON record (start_date);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_record_type ON record (type);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_sensitivitypoint_audiogram_id ON sensitivitypoint (audiogram_id);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_visionattachment_vision_prescription_id ON visionattachment (vision_prescription_id);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_visionprescription_health_data_id ON visionprescription (health_data_id);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_workout_end_date ON workout (end_date);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_workout_health_data_id ON workout (health_data_id);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_workout_start_date ON workout (start_date);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_workout_workout_activity_type ON workout (workout_activity_type);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_workoutevent_date ON workoutevent (date);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_workoutevent_workout_id ON workoutevent (workout_id);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_workoutroute_end_date ON workoutroute (end_date);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_workoutroute_start_date ON workoutroute (start_date);"
+  },
+  {
+    "sql || ';'": "CREATE UNIQUE INDEX ix_workoutroute_workout_id ON workoutroute (workout_id);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_workoutstatistics_end_date ON workoutstatistics (end_date);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_workoutstatistics_start_date ON workoutstatistics (start_date);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_workoutstatistics_type ON workoutstatistics (type);"
+  },
+  {
+    "sql || ';'": "CREATE INDEX ix_workoutstatistics_workout_id ON workoutstatistics (workout_id);"
+  }
+]

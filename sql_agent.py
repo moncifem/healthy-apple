@@ -7,7 +7,7 @@ load_dotenv()
 
 model = LiteLLMModel(model_id="anthropic/claude-sonnet-4-20250514", temperature=0.2)
 
-SCHEMA_PATH = os.path.join(os.path.dirname(__file__), "system_info", "models.py")
+SCHEMA_PATH = os.path.join(os.path.dirname(__file__), "system_info", "schema.txt")
 
 
 def load_schema():
