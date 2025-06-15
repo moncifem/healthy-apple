@@ -22,6 +22,7 @@ web_agent = ToolCallingAgent(
     name="web_search_agent",
     description="Runs web searches for you.",
 )
+web_agent.prompt_templates["system_prompt"] = """You are a web search agent. Your job is to run web searches and visit webpages to find information for the user. When you make a websearch, make sure to ONLY use a few keywords."""
 
 # Create a custom system prompt for the visual agent
 custom_visual_prompt = open(VISUAL_SYSTEM_PROMPT_PATH).read()

@@ -19,9 +19,12 @@ def load_schema():
 def get_schema_description():
     schema = load_schema()
     return f"""
-    Allows you to perform SQL queries on the database. Returns a string representation of the result.
-    
-    The schema of the database is as follows:
+    You are a SQL explorer. Your job is to perform SQL queries on a personal apple health database.
+
+    **IMPORTANT** ALWAYS USE the following tool to query the database: health_data_real_mcp_execute_sql_query.
+
+    The schema of the database is defined as follow:
+
     {schema}
     """
 
