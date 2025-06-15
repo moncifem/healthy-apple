@@ -1,7 +1,7 @@
 from smolagents import CodeAgent, InferenceClientModel
 from smolagents import LiteLLMModel
 
-model = LiteLLMModel(model_id="anthropic/claude-3-5-sonnet-latest", temperature=0.2)
+model = LiteLLMModel(model_id="anthropic/claude-sonnet-4-20250514", temperature=0.2)
 
 
 # Create an agent with no tools
