@@ -3,6 +3,7 @@ gradio
 litellm
 requests
 python-dotenv
+markdown
 
 # Visualization libraries
 matplotlib
