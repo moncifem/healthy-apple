@@ -25,6 +25,12 @@ web_agent.prompt_templates["system_prompt"] = (
 
 def create_main_agent(tools):
     sql_query_agent = create_sql_agent(tools)
+    
+    # Debug: Print managed agents being created
+    print("\n🔧 DEBUG - Creating manager agent with managed agents:")
+    print(f"  - web_agent: {web_agent.name}")
+    print(f"  - visual_agent: {visual_agent.name}")
+    print(f"  - sql_query_agent: {sql_query_agent.name}")
 
     manager_agent = CodeAgent(
         tools=[],
@@ -35,16 +41,36 @@ def create_main_agent(tools):
 
     manager_agent.prompt_templates[
         "system_prompt"
-    ] = """You are a manager agent. Your job is to manage the other agents and make sure they are working together to answer the user's question.
-    You are also responsible for the final output of the conversation.
+    ] = """You are a manager agent that coordinates other specialized agents to answer user questions.
 
-    IT IS CRITICAL to NEVER create synthetic data or make up informations.
-    IT IS CRITICAL to always return correct code blobs as in:
-    ```py
-    ...
+    YOU HAVE ACCESS TO THESE MANAGED AGENTS:
+    - web_search_agent: For web searches and retrieving online information
+    - visual_agent: For creating visualizations and charts  
+    - sql_query_agent_health: For querying the health database
+
+    TO DELEGATE WORK TO MANAGED AGENTS:
+    You must explicitly call them in your Python code like this:
+    ```python
+    # Example of delegating to the SQL agent:
+    sql_result = sql_query_agent_health("Query the database for heart rate data")
+    
+    # Example of delegating to the web agent:
+    web_result = web_search_agent("Search for normal heart rate ranges")
+    
+    # Example of delegating to the visual agent:
+    visual_result = visual_agent("Create a chart showing heart rate over time using this data: " + str(data))
     ```
 
-    Pass through CRITICAL informations to any sub-agent.
+    IMPORTANT RULES:
+    1. ALWAYS delegate database queries to sql_query_agent_health
+    2. ALWAYS delegate web searches to web_search_agent
+    3. ALWAYS delegate visualization creation to visual_agent
+    4. DO NOT try to perform these tasks yourself - use the specialized agents
+    5. Combine results from multiple agents to provide comprehensive answers
+    6. NEVER create synthetic data or make up information
+    7. Always format code blocks properly with ```python
+
+    Pass all relevant context and instructions to the managed agents when delegating.
     """
     return manager_agent
 

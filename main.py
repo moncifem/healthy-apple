@@ -8,7 +8,11 @@ import base64
 
 RESPONSE_INSTRUCTIONS = {
     "Short Answer": "Provide a short, concise answer to the user's question.",
-    "Detailed Report": "Provide a detailed report of the user's health data. Include benchmark comparisons to the general population. Create a visualization to help the user understand the data.",
+    "Detailed Report": """
+1. Use the sql_query_agent_health managed agent to get a detailed view of the user's health data.
+2. Use the web search managed agent to include benchmark comparisons to the general population and other relevant data.
+3. Use the visual_agent to create a visualization to help the user understand the data.
+""",
 }
 
 
@@ -78,8 +82,18 @@ def chat_with_agent(message, history, response_mode):
         # Add mode instruction to the message
         modified_message = f"{message}\n\n{RESPONSE_INSTRUCTIONS[response_mode]}"
 
+        # Debug: Print the modified message
+        print(f"\n🔍 DEBUG - Modified message being sent to manager_agent:")
+        print(f"{modified_message}\n")
+
         # Run the user's query directly through the manager agent
-        result = demo.manager_agent.run(modified_message)
+        try:
+            result = demo.manager_agent.run(modified_message)
+            print(f"\n✅ DEBUG - Manager agent returned result of type: {type(result)}")
+            print(f"Result preview: {str(result)[:200]}...\n")
+        except Exception as e:
+            print(f"\n❌ DEBUG - Manager agent error: {str(e)}")
+            raise
 
         # Step 4: Creating visualizations
         history[-1]["content"] = """
