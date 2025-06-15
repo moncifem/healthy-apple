@@ -6,8 +6,13 @@ from smolagents import MCPClient
 from sql_agent import SERVER_PARAMETERS
 import base64
 
+RESPONSE_INSTRUCTIONS = {
+    "Short Answer": "Provide a short, concise answer to the user's question.",
+    "Detailed Report": "Provide a detailed report of the user's health data. Include benchmark comparisons to the general population. Create a visualization to help the user understand the data.",
+}
 
-def chat_with_agent(message, history):
+
+def chat_with_agent(message, history, response_mode):
     """
     Simple chat function that runs the user's query through the multi-agent system
     """
@@ -15,7 +20,10 @@ def chat_with_agent(message, history):
         return history, ""
 
     # Add user message to history
-    history = history + [{"role": "user", "content": message}, {"role": "assistant", "content": None}]
+    history = history + [
+        {"role": "user", "content": message},
+        {"role": "assistant", "content": None},
+    ]
 
     try:
         # Show progress in the chat
@@ -28,8 +36,11 @@ def chat_with_agent(message, history):
         history[-1]["content"] = "🧠 Analyzing data and generating insights..."
         yield history, ""
 
+        # Add mode instruction to the message
+        modified_message = f"{message}\n\n{RESPONSE_INSTRUCTIONS[response_mode]}"
+
         # Run the user's query directly through the manager agent
-        result = demo.manager_agent.run(message)
+        result = demo.manager_agent.run(modified_message)
 
         history[-1]["content"] = "📊 Creating visualizations..."
         yield history, ""
@@ -95,6 +106,13 @@ with gr.Blocks(title="Apple Health Assistant") as demo:
 
         with gr.Row():
             with gr.Column(scale=3):
+                # Response mode selection
+                response_mode = gr.Radio(
+                    choices=["Short Answer", "Detailed Report"],
+                    value="Short Answer",
+                    label="Response Mode",
+                    info="Choose how detailed you want the response to be",
+                )
 
                 # Chat interface with HTML support for inline images
                 chatbot = gr.Chatbot(
@@ -143,10 +161,10 @@ with gr.Blocks(title="Apple Health Assistant") as demo:
             ex2 = gr.Button("💤 Sleep Health", size="sm")
             ex3 = gr.Button("🏃 Activity Level", size="sm")
 
-        def submit_and_refresh(message, history):
+        def submit_and_refresh(message, history, response_mode):
             """Submit message and refresh image"""
             # Process the chat
-            for updated_history, _ in chat_with_agent(message, history):
+            for updated_history, _ in chat_with_agent(message, history, response_mode):
                 yield updated_history, "", get_latest_image()
 
         def clear_chat():
@@ -157,17 +175,17 @@ with gr.Blocks(title="Apple Health Assistant") as demo:
 
         # Store manager_agent as demo attribute for access in functions
         demo.manager_agent = manager_agent
-        
+
         # Event handlers
         submit_btn.click(
             submit_and_refresh,
-            inputs=[msg, chatbot],
+            inputs=[msg, chatbot, response_mode],
             outputs=[chatbot, msg, image_display],
         )
 
         msg.submit(
             submit_and_refresh,
-            inputs=[msg, chatbot],
+            inputs=[msg, chatbot, response_mode],
             outputs=[chatbot, msg, image_display],
         )
 

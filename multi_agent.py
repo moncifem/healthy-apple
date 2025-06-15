@@ -6,12 +6,8 @@ from smolagents import (
     LiteLLMModel,
 )
 from tool import visit_webpage
-import os
 from sql_agent import create_sql_agent, SERVER_PARAMETERS
-
-VISUAL_SYSTEM_PROMPT_PATH = os.path.join(
-    os.path.dirname(__file__), "system_info", "visual_prompt.txt"
-)
+from visual_agent import visual_agent
 
 model = LiteLLMModel(model_id="anthropic/claude-sonnet-4-20250514", temperature=0.2)
 
@@ -22,35 +18,9 @@ web_agent = ToolCallingAgent(
     name="web_search_agent",
     description="Runs web searches for you.",
 )
-web_agent.prompt_templates["system_prompt"] = """You are a web search agent. Your job is to run web searches and visit webpages to find information for the user. When you make a websearch, make sure to ONLY use a few keywords."""
-
-# Create a custom system prompt for the visual agent
-custom_visual_prompt = open(VISUAL_SYSTEM_PROMPT_PATH).read()
-
-visual_agent = CodeAgent(
-    tools=[],
-    model=model,
-    additional_authorized_imports=[
-        "matplotlib",
-        "matplotlib.pyplot",
-        "seaborn",
-        "plotly",
-        "plotly.graph_objects",
-        "plotly.express",
-        "plotly.offline",
-        "numpy",
-        "pandas",
-        "scipy",
-        "datetime",
-        "math",
-        "random",
-    ],
-    name="visual_agent",
-    description="Creates beautiful, professional visualizations and saves them locally. Always uses proper code format and saves files correctly.",
+web_agent.prompt_templates["system_prompt"] = (
+    """You are a web search agent. Your job is to run web searches and visit webpages to find information for the user. When you make a websearch, make sure to ONLY use a few keywords."""
 )
-
-# Modify the system prompt after initialization
-visual_agent.prompt_templates["system_prompt"] = custom_visual_prompt
 
 
 def create_main_agent(tools):
@@ -62,6 +32,12 @@ def create_main_agent(tools):
         managed_agents=[web_agent, visual_agent, sql_query_agent],
         additional_authorized_imports=["time", "numpy", "pandas"],
     )
+
+    manager_agent.prompt_templates[
+        "system_prompt"
+    ] = """You are a manager agent. Your job is to manage the other agents and make sure they are working together to answer the user's question.
+    You are also responsible for the final output of the conversation.
+    """
     return manager_agent
 
 
