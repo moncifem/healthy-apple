@@ -1,2 +1,23 @@
-smolagents[toolkit]
-smolagents[lite-llm]
+# Core dependencies
+gradio
+smolagents
+litellm
+requests
+python-dotenv
+
+# Visualization libraries
+matplotlib
+seaborn
+plotly
+kaleido
+numpy
+pandas
+scipy
+
+# Clerk auth dependencies (for main_clerk.py)
+fastapi-clerk-auth>=0.0.7
+python-jose[cryptography]>=3.3.0
+
+# Additional dependencies
+fastapi
+uvicorn[standard]
