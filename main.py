@@ -1,11 +1,13 @@
 import gradio as gr
 import os
 from pathlib import Path
-from multi_agent import manager_agent
+from multi_agent import create_main_agent
+from smolagents import MCPClient
+from sql_agent import SERVER_PARAMETERS
 import base64
 
 
-def chat_with_agent(message, history):
+def chat_with_agent(manager_agent, message, history):
     """
     Simple chat function that runs the user's query through the multi-agent system
     """
@@ -79,102 +81,117 @@ def get_latest_image():
 
 # Create simple interface
 with gr.Blocks(title="Apple Health Assistant") as demo:
-    gr.HTML(
-        """
-    <div style="text-align: center; margin-bottom: 20px;">
-        <h1>🍏 Health Assistant</h1>
-        <p>Ask me anything about your health! I'll help you understand your health data and create a health improvement plan.</p>
-    </div>
-    """
-    )
+    with MCPClient(SERVER_PARAMETERS) as mcp_client:
+        manager_agent = create_main_agent(mcp_client)
 
-    with gr.Row():
-        with gr.Column(scale=3):
-            # Chat interface with HTML support for inline images
-            chatbot = gr.Chatbot(
-                label="Chat",
-                height=600,
-                type="tuples",
-                show_copy_button=True,
-                elem_classes=["chat-container"],
-            )
-
-            msg = gr.Textbox(
-                label="Message",
-                placeholder="Ask me to research something and create a visualization...",
-                lines=2,
-                scale=4,
-            )
-
-            with gr.Row():
-                submit_btn = gr.Button("Send 📤", variant="primary", scale=1)
-                clear_btn = gr.Button("Clear 🗑️", scale=1)
-
-        with gr.Column(scale=1):
-            # Status and backup image display
-            gr.HTML(
-                """
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
-                <h4>📊 Latest Visualization</h4>
-                <p style="font-size: 12px; color: #666;">Images also appear inline in the chat</p>
-            </div>
+        gr.HTML(
             """
-            )
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h1>🍏 Health Assistant</h1>
+            <p>Ask me anything about your health! I'll help you understand your health data and create a health improvement plan.</p>
+        </div>
+        """
+        )
 
-            image_display = gr.Image(
-                label="Backup Image View", show_download_button=True, height=300, show_label=False
-            )
+        with gr.Row():
+            with gr.Column(scale=3):
 
-            refresh_img_btn = gr.Button("🔄 Refresh Image", size="sm")
+                # Chat interface with HTML support for inline images
+                chatbot = gr.Chatbot(
+                    label="Chat",
+                    height=600,
+                    type="tuples",
+                    show_copy_button=True,
+                    elem_classes=["chat-container"],
+                )
 
-    # Example buttons
-    gr.HTML("<h3>💡 Try these examples:</h3>")
-    with gr.Row():
-        ex1 = gr.Button("💓 Heart Health", size="sm")
-        ex2 = gr.Button("💤 Sleep Health", size="sm")
-        ex3 = gr.Button("🏃 Activity Level", size="sm")
+                msg = gr.Textbox(
+                    label="Message",
+                    placeholder="Ask me to research something and create a visualization...",
+                    lines=2,
+                    scale=4,
+                )
 
-    def submit_and_refresh(message, history):
-        """Submit message and refresh image"""
-        # Process the chat
-        for updated_history, _ in chat_with_agent(message, history):
-            yield updated_history, "", get_latest_image()
+                with gr.Row():
+                    submit_btn = gr.Button("Send 📤", variant="primary", scale=1)
+                    clear_btn = gr.Button("Clear 🗑️", scale=1)
 
-    def clear_chat():
-        return [], ""
+            with gr.Column(scale=1):
+                # Status and backup image display
+                gr.HTML(
+                    """
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                    <h4>📊 Latest Visualization</h4>
+                    <p style="font-size: 12px; color: #666;">Images also appear inline in the chat</p>
+                </div>
+                """
+                )
 
-    def refresh_image():
-        return get_latest_image()
+                image_display = gr.Image(
+                    label="Backup Image View",
+                    show_download_button=True,
+                    height=300,
+                    show_label=False,
+                )
 
-    # Event handlers
-    submit_btn.click(
-        submit_and_refresh, inputs=[msg, chatbot], outputs=[chatbot, msg, image_display]
-    )
+                refresh_img_btn = gr.Button("🔄 Refresh Image", size="sm")
 
-    msg.submit(submit_and_refresh, inputs=[msg, chatbot], outputs=[chatbot, msg, image_display])
+        # Example buttons
+        gr.HTML("<h3>💡 Try these examples:</h3>")
+        with gr.Row():
+            ex1 = gr.Button("💓 Heart Health", size="sm")
+            ex2 = gr.Button("💤 Sleep Health", size="sm")
+            ex3 = gr.Button("🏃 Activity Level", size="sm")
 
-    clear_btn.click(clear_chat, outputs=[chatbot, msg])
+        def submit_and_refresh(manager_agent, message, history):
+            """Submit message and refresh image"""
+            # Process the chat
+            for updated_history, _ in chat_with_agent(manager_agent, message, history):
+                yield updated_history, "", get_latest_image()
 
-    refresh_img_btn.click(refresh_image, outputs=[image_display])
+        def clear_chat():
+            return [], ""
 
-    # Example button events
-    ex1.click(lambda: "How is my heart health, compared to people in my age group?", outputs=msg)
-    ex2.click(lambda: "How well am I sleeping?", outputs=msg)
-    ex3.click(lambda: "How can I improve my activity level?", outputs=msg)
+        def refresh_image():
+            return get_latest_image()
 
-    # Add custom CSS for better image display in chat
-    demo.css = """
-    .chat-container .message img {
-        max-width: 100% !important;
-        height: auto !important;
-        border-radius: 8px !important;
-        margin: 10px 0 !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
-    }
-    .chat-container {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
-    """
+        # Event handlers
+        submit_btn.click(
+            submit_and_refresh,
+            inputs=[manager_agent, msg, chatbot],
+            outputs=[chatbot, msg, image_display],
+        )
+
+        msg.submit(
+            submit_and_refresh,
+            inputs=[manager_agent, msg, chatbot],
+            outputs=[chatbot, msg, image_display],
+        )
+
+        clear_btn.click(clear_chat, outputs=[chatbot, msg])
+
+        refresh_img_btn.click(refresh_image, outputs=[image_display])
+
+        # Example button events
+        ex1.click(
+            lambda: "How is my heart health, compared to people in my age group?", outputs=msg
+        )
+        ex2.click(lambda: "How well am I sleeping?", outputs=msg)
+        ex3.click(lambda: "How can I improve my activity level?", outputs=msg)
+
+        # Add custom CSS for better image display in chat
+        demo.css = """
+        .chat-container .message img {
+            max-width: 100% !important;
+            height: auto !important;
+            border-radius: 8px !important;
+            margin: 10px 0 !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+        }
+        .chat-container {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        """
 
 if __name__ == "__main__":
     # Ensure we have write permissions in current directory
