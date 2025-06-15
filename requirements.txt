@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Core dependencies
 gradio
 smolagents
@@ -21,3 +22,8 @@ python-jose[cryptography]>=3.3.0
 # Additional dependencies
 fastapi
 uvicorn[standard]
+=======
+smolagents[toolkit]
+smolagents[lite-llm]
+sqlmodel==0.0.24
+>>>>>>> 937416bb40146734ebf837f61cbabe57a0a17719
