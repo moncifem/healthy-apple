@@ -7,7 +7,7 @@ from sql_agent import SERVER_PARAMETERS
 import base64
 
 
-def chat_with_agent(manager_agent, message, history):
+def chat_with_agent(message, history):
     """
     Simple chat function that runs the user's query through the multi-agent system
     """
@@ -15,23 +15,23 @@ def chat_with_agent(manager_agent, message, history):
         return history, ""
 
     # Add user message to history
-    history = history + [[message, None]]
+    history = history + [{"role": "user", "content": message}, {"role": "assistant", "content": None}]
 
     try:
         # Show progress in the chat
-        history[-1][1] = "🚀 Starting analysis..."
+        history[-1]["content"] = "🚀 Starting analysis..."
         yield history, ""
 
-        history[-1][1] = "🔍 Searching for relevant information..."
+        history[-1]["content"] = "🔍 Searching for relevant information..."
         yield history, ""
 
-        history[-1][1] = "🧠 Analyzing data and generating insights..."
+        history[-1]["content"] = "🧠 Analyzing data and generating insights..."
         yield history, ""
 
         # Run the user's query directly through the manager agent
-        result = manager_agent.run(message)
+        result = demo.manager_agent.run(message)
 
-        history[-1][1] = "📊 Creating visualizations..."
+        history[-1]["content"] = "📊 Creating visualizations..."
         yield history, ""
 
         # Check if any image files were created
@@ -60,11 +60,11 @@ def chat_with_agent(manager_agent, message, history):
                 )
 
         # Update with final result
-        history[-1][1] = final_response
+        history[-1]["content"] = final_response
         yield history, ""
 
     except Exception as e:
-        history[-1][1] = f"❌ Error occurred: {str(e)}"
+        history[-1]["content"] = f"❌ Error occurred: {str(e)}"
         yield history, ""
 
 
@@ -100,7 +100,7 @@ with gr.Blocks(title="Apple Health Assistant") as demo:
                 chatbot = gr.Chatbot(
                     label="Chat",
                     height=600,
-                    type="tuples",
+                    type="messages",
                     show_copy_button=True,
                     elem_classes=["chat-container"],
                 )
@@ -143,10 +143,10 @@ with gr.Blocks(title="Apple Health Assistant") as demo:
             ex2 = gr.Button("💤 Sleep Health", size="sm")
             ex3 = gr.Button("🏃 Activity Level", size="sm")
 
-        def submit_and_refresh(manager_agent, message, history):
+        def submit_and_refresh(message, history):
             """Submit message and refresh image"""
             # Process the chat
-            for updated_history, _ in chat_with_agent(manager_agent, message, history):
+            for updated_history, _ in chat_with_agent(message, history):
                 yield updated_history, "", get_latest_image()
 
         def clear_chat():
@@ -155,16 +155,19 @@ with gr.Blocks(title="Apple Health Assistant") as demo:
         def refresh_image():
             return get_latest_image()
 
+        # Store manager_agent as demo attribute for access in functions
+        demo.manager_agent = manager_agent
+        
         # Event handlers
         submit_btn.click(
             submit_and_refresh,
-            inputs=[manager_agent, msg, chatbot],
+            inputs=[msg, chatbot],
             outputs=[chatbot, msg, image_display],
         )
 
         msg.submit(
             submit_and_refresh,
-            inputs=[manager_agent, msg, chatbot],
+            inputs=[msg, chatbot],
             outputs=[chatbot, msg, image_display],
         )
 
