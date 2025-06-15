@@ -18,20 +18,69 @@ def chat_with_agent(message, history):
     history = history + [{"role": "user", "content": message}, {"role": "assistant", "content": None}]
 
     try:
-        # Show progress in the chat
-        history[-1]["content"] = "🚀 Starting analysis..."
+        # Step 1: Starting analysis with animation
+        history[-1]["content"] = """
+        <div style="text-align: center; padding: 3rem; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 16px; margin: 1rem 0;">
+            <div style="display: inline-block; position: relative;">
+                <div style="font-size: 4rem; animation: bounce 1s ease-in-out infinite;">🚀</div>
+                <div style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 60px; height: 4px; background: #6366f1; border-radius: 2px; animation: pulse 1s ease-in-out infinite;"></div>
+            </div>
+            <h2 style="margin-top: 2rem; color: #1e293b;">Initializing Health Analysis</h2>
+            <p style="color: #64748b;">Preparing to analyze your health data...</p>
+        </div>
+        <style>
+            @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-20px); }
+            }
+            @keyframes pulse {
+                0%, 100% { transform: translateX(-50%) scaleX(1); opacity: 1; }
+                50% { transform: translateX(-50%) scaleX(1.5); opacity: 0.7; }
+            }
+        </style>
+        """
         yield history, ""
 
-        history[-1]["content"] = "🔍 Searching for relevant information..."
+        # Step 2: Searching database
+        history[-1]["content"] = """
+        <div style="text-align: center; padding: 3rem; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 16px; margin: 1rem 0;">
+            <div style="display: inline-block; position: relative;">
+                <div style="font-size: 4rem; animation: bounce 1s ease-in-out infinite;">🔍</div>
+                <div style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 60px; height: 4px; background: #f59e0b; border-radius: 2px; animation: pulse 1s ease-in-out infinite;"></div>
+            </div>
+            <h2 style="margin-top: 2rem; color: #1e293b;">Searching Health Database</h2>
+            <p style="color: #64748b;">Querying your health records and metrics...</p>
+        </div>
+        """
         yield history, ""
 
-        history[-1]["content"] = "🧠 Analyzing data and generating insights..."
+        # Step 3: Analyzing data
+        history[-1]["content"] = """
+        <div style="text-align: center; padding: 3rem; background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); border-radius: 16px; margin: 1rem 0;">
+            <div style="display: inline-block; position: relative;">
+                <div style="font-size: 4rem; animation: bounce 1s ease-in-out infinite;">🧠</div>
+                <div style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 60px; height: 4px; background: #8b5cf6; border-radius: 2px; animation: pulse 1s ease-in-out infinite;"></div>
+            </div>
+            <h2 style="margin-top: 2rem; color: #1e293b;">Analyzing Health Patterns</h2>
+            <p style="color: #64748b;">Processing data and generating insights...</p>
+        </div>
+        """
         yield history, ""
 
         # Run the user's query directly through the manager agent
         result = demo.manager_agent.run(message)
 
-        history[-1]["content"] = "📊 Creating visualizations..."
+        # Step 4: Creating visualizations
+        history[-1]["content"] = """
+        <div style="text-align: center; padding: 3rem; background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); border-radius: 16px; margin: 1rem 0;">
+            <div style="display: inline-block; position: relative;">
+                <div style="font-size: 4rem; animation: bounce 1s ease-in-out infinite;">📊</div>
+                <div style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 60px; height: 4px; background: #10b981; border-radius: 2px; animation: pulse 1s ease-in-out infinite;"></div>
+            </div>
+            <h2 style="margin-top: 2rem; color: #1e293b;">Creating Visualizations</h2>
+            <p style="color: #64748b;">Generating charts and visual insights...</p>
+        </div>
+        """
         yield history, ""
 
         # Check if any image files were created
@@ -64,7 +113,16 @@ def chat_with_agent(message, history):
         yield history, ""
 
     except Exception as e:
-        history[-1]["content"] = f"❌ Error occurred: {str(e)}"
+        history[-1]["content"] = f"""
+        <div style="text-align: center; padding: 3rem; background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-radius: 16px; margin: 1rem 0;">
+            <div style="display: inline-block; position: relative;">
+                <div style="font-size: 4rem;">❌</div>
+            </div>
+            <h2 style="margin-top: 2rem; color: #dc2626;">Analysis Error</h2>
+            <p style="color: #7f1d1d;">{str(e)}</p>
+            <p style="color: #991b1b; margin-top: 1rem; font-size: 0.9rem;">Please try again or contact support if the issue persists.</p>
+        </div>
+        """
         yield history, ""
 
 
